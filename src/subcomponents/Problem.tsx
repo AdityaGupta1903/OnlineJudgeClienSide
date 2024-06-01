@@ -13,7 +13,7 @@ const Problem: React.FC = () => {
   const navigate = useNavigate();
   const [Problems, setProblems] = useState<IQuestion[]>([]);
   useEffect(() => {
-    axios.get("http://onlinejudge.backend.adityagupta.tech/").then((resp) => {
+    axios.get("http://onlinejudge.backend.adityagupta.tech/GetAllProblems").then((resp) => {
       const QuestionArray = resp.data;
       console.log(QuestionArray);
       for (let i = 0; i < QuestionArray?.length; i++) {
