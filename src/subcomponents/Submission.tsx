@@ -15,7 +15,7 @@ function Submission() {
   console.log(id);
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    axios.get(`http://onlinejudge.backend.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
+    axios.get(`https://onlinejudge.backend.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
       console.log(resp);
       setProblemDescriptionAndSign({
         Description: resp.data.Description,
