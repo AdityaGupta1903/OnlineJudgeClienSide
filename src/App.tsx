@@ -6,11 +6,11 @@ import Submission from "./subcomponents/Submission";
 
 
 function App() {
-
+  console.log("ADI");
   return (
     <BrowserRouter>
     <Routes>
-      <Route path="/Problems" element={<Problem/>}/>
+      <Route path="/" element={<Problem/>}/>
        <Route path="/Problem/:id" element={<Submission/>}/>
     </Routes>
   </BrowserRouter>
