@@ -7,34 +7,51 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import IQuestionInEditor from "../models/IQuestionInEditor";
 import Card from "@mui/material/Card/Card";
-
+import { io } from "socket.io-client";
+const socket = io("http://localhost:3000", {
+  transports: ["websocket", "polling", "flashsocket"],
+});
 function Submission() {
   const [ProblemDescriptionAndSign, setProblemDescriptionAndSign] =
     useState<IQuestionInEditor>();
   const { id } = useParams();
-  console.log(id);
+
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    axios.get(`https://onlinejudge.backend.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
-      console.log(resp);
-      setProblemDescriptionAndSign({
-        Description: resp.data.Description,
-        Sign: resp.data.Sign,
-        args: resp.data.args,
-        SampleInput: resp.data.SampleInput,
-        SampleOutput: resp.data.SampleOutput,
-        ID: resp.data.ID,
-      });
+    // Initialize the socket connection
+
+    // Set up the event listener for 'ResultConnection'
+    socket.on("ResultConnection", (Result) => {
+      console.log(Result);
     });
-  }, []);
-  console.log(ProblemDescriptionAndSign);
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    // Fetch problem details from the server
+    axios
+      .get(`https://onlinejudge.backend.adityagupta.tech/GetProblem/${id}`)
+      .then((resp: any) => {
+        setProblemDescriptionAndSign({
+          Description: resp.data.Description,
+          Sign: resp.data.Sign,
+          args: resp.data.args,
+          SampleInput: resp.data.SampleInput,
+          SampleOutput: resp.data.SampleOutput,
+          ID: resp.data.ID,
+        });
+      });
+  }, [id]);
 
   return (
     <div className="h-screen grid" style={{ gridTemplateColumns: "40% 60%" }}>
       <div className="relative" style={{ left: "5%" }}>
         <div className="m-2 font-bold">Question :-</div>
         <div
-          className="m-2  mt-6 text-3xl"
+          className="m-2 mt-6 text-3xl"
           style={{ wordWrap: "break-word", maxWidth: "90%" }}
         >
           {ProblemDescriptionAndSign?.Description ?? ""}

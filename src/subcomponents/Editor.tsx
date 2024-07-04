@@ -18,7 +18,7 @@ const Editor: React.FC<{ Sign: string; args: String; ID: number }> = (
     setValue(e);
   };
   const HandleSubmit = () => {
-    fetch("https://onlinejudge.backend.adityagupta.tech/SubmitProblem", {
+    fetch("http://localhost:3000/SubmitProblem", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
