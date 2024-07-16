@@ -1,42 +1,49 @@
-/* eslint-disable no-empty */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Card } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import IQuestion from "../models/IQuestion";
+import { useQuery } from "react-query";
+import { QuestionArray } from "../api/function";
 
 // eslint-disable-next-line react-refresh/only-export-components
-const Problem: React.FC = () => {
+const Problem: React.FC<{AllProblemofUser:any}> = ({AllProblemofUser}) => {
   const navigate = useNavigate();
-  const [Problems, setProblems] = useState<IQuestion[]>([]);
-  useEffect(() => {
-    axios.get("https://onlinejudge.backend.adityagupta.tech/GetAllProblems").then((resp) => {
-      const QuestionArray = resp.data;
-      console.log(QuestionArray);
-      for (let i = 0; i < QuestionArray?.length; i++) {
-        setProblems((prev) => [
-          ...prev,
-          { Question: QuestionArray[i]?.Description, ID: QuestionArray[i]?.ID },
-        ]);
+  const {data:Problems} = useQuery('Problems',async()=> await QuestionArray());
+  const getSolvedState = (Element : IQuestion) =>{
+    let solvedState = "UnAttempted"
+    if(AllProblemofUser){
+      let list = AllProblemofUser;
+      for(let i = 0;i<list.length;i++){
+        if(list[i].ProblemId === Element.ID){
+          solvedState = list[i].Virdict;
+          break;
+        }
       }
-    }).catch((err)=>console.log(err));
-  }, []);
-  console.log(Problems);
+    }
+     return solvedState;
+  }
+ //// Update the Solved and Unsolved State in this
+ console.log(AllProblemofUser);
+ 
   return (
     <div>
-      {Problems.map((Element, _key) => {
+      { Problems && Problems.map((Element :any, _key:any) => {
+        let SolvedState = getSolvedState(Element);
+        console.log(SolvedState)
         return (
           <div
-            className="m-4"
+            className="m-4 pl-4 pr-4 pt-2"
             onClick={() => {
-              navigate(`/Problem/${Element.ID}`);
+              navigate(`/Problem/${Element?.ID}`);
             }}
           >
             <Card className="p-3" style={{ backgroundColor: "#FFFAE6" }}>
-              {Element.Question}
+            <div className="flex justify-between">
+            <div>
+            {Element?.Description}
+            </div>
+            <div>
+            </div>
+              </div>             
             </Card>
           </div>
         );

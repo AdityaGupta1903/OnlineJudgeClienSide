@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import Button from "@mui/material/Button";
-
 import { useState } from "react";
 import MonacoEditor from "react-monaco-editor";
-const Editor: React.FC<{ Sign: string; args: String; ID: number }> = (
+import { IProp } from "./Submission";
+
+const Editor: React.FC<{ Sign: string; args: String; ID: number,prop:IProp,setisLoading:React.Dispatch<React.SetStateAction<boolean>>}> = (
   props
 ) => {
   const DefaultString = `function ${props.Sign}( arg1 ){
@@ -18,10 +19,15 @@ const Editor: React.FC<{ Sign: string; args: String; ID: number }> = (
     setValue(e);
   };
   const HandleSubmit = () => {
-    fetch("http://localhost:3000/SubmitProblem", {
+    const token = localStorage.getItem("token");
+    if(token){
+      console.log(token);
+      props.setisLoading(true);
+    fetch("https://algoforces.backend.adityagupta.tech/SubmitProblem", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "authorization" : `Bearer ${token}`
       },
       body: JSON.stringify({
         Signature: props.Sign,
@@ -32,6 +38,16 @@ const Editor: React.FC<{ Sign: string; args: String; ID: number }> = (
     }).then((resp) => {
       console.log(resp);
     });
+    console.log("Send the refetch call on Submission")
+   setTimeout(()=>{
+    props.setisLoading(false);
+   },12000)
+    
+   setTimeout(props.prop.refetchAllProblemofUser,12000);
+    }
+    else{
+       console.log("Error Submitting the Problem")
+    }
   };
 
   return (
@@ -57,7 +73,7 @@ const Editor: React.FC<{ Sign: string; args: String; ID: number }> = (
           variant="contained"
           style={{ background: "#455A64" }}
           onClick={() => {
-            HandleSubmit();
+           HandleSubmit();
           }}
         >
           Submit

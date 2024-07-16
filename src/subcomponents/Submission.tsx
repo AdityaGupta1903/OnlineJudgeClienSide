@@ -1,49 +1,45 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { useEffect, useState } from "react";
 import Editor from "./Editor";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import IQuestionInEditor from "../models/IQuestionInEditor";
 import Card from "@mui/material/Card/Card";
-import { io } from "socket.io-client";
-const socket = io("http://localhost:3000", {
-  transports: ["websocket", "polling", "flashsocket"],
-});
-function Submission() {
+import {
+  RefetchOptions,
+  RefetchQueryFilters,
+  QueryObserverResult,
+} from "react-query";
+import IResult from "../models/IResult";
+import {  Blocks } from "react-loader-spinner";
+
+export interface IProp {
+  refetchAllProblemofUser: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<IResult[], unknown>>;
+  AllProblemofUser: any;
+}
+function Submission(props: IProp) {
   const [ProblemDescriptionAndSign, setProblemDescriptionAndSign] =
     useState<IQuestionInEditor>();
+  const [isLoading, setisLoading] = useState<boolean>(false);
+  const [isFirstTimeSubmission,setisFirstTimeSubmission] = useState<boolean>(true);
   const { id } = useParams();
-
-  useEffect(() => {
-    // Initialize the socket connection
-
-    // Set up the event listener for 'ResultConnection'
-    socket.on("ResultConnection", (Result) => {
-      console.log(Result);
-    });
-
-    // Clean up the socket connection on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket]);
-
+  console.log(props.AllProblemofUser);
   useEffect(() => {
     // Fetch problem details from the server
-    axios
-      .get(`https://onlinejudge.backend.adityagupta.tech/GetProblem/${id}`)
-      .then((resp: any) => {
-        setProblemDescriptionAndSign({
-          Description: resp.data.Description,
-          Sign: resp.data.Sign,
-          args: resp.data.args,
-          SampleInput: resp.data.SampleInput,
-          SampleOutput: resp.data.SampleOutput,
-          ID: resp.data.ID,
-        });
+   
+    axios.get(`https://algoforces.backend.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
+      setProblemDescriptionAndSign({
+        Description: resp.data.Description,
+        Sign: resp.data.Sign,
+        args: resp.data.args,
+        SampleInput: resp.data.SampleInput,
+        SampleOutput: resp.data.SampleOutput,
+        ID: resp.data.ID,
       });
+    });
   }, [id]);
 
   return (
@@ -76,17 +72,66 @@ function Submission() {
         <div className="mt-2 ml-1" style={{ fontWeight: "600" }}>
           Time Limit - 1s
         </div>
+        {
+          <div>
+            <div className="mt-10 font-bold text-xl bg-neutral-400 mr-16 pl-2 pt-1 pb-1 ">
+              Last Submission Status
+            </div>
+            {props.AllProblemofUser &&
+              props.AllProblemofUser.map((ele: any) => {
+                if (ele.ProblemId === Number(id)) {
+                   isFirstTimeSubmission && setisFirstTimeSubmission(false);
+                  return (
+                    <Card className={isLoading ? `w-fit m-3 p-3 !font-bold !text-white !bg-amber-400`:`w-fit m-3 p-3  ${ele?.Virdict === 'Accepted'?'!bg-green-600 !text-white !font-bold':'!bg-red-600 !text-white !font-bold'}`}>
+                      <div className="flex justify-around items-center">
+                        <div>{isLoading ? "Processing...":ele?.Virdict}</div>
+                        <div>
+                          <Blocks
+                            height="40"
+                            width="30"
+                            color="#478CCF"
+                            ariaLabel="blocks-loading"
+                            wrapperStyle={{}}
+                            wrapperClass="blocks-wrapper"
+                            visible={isLoading === true}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                }
+              })}
+              {
+                isLoading && isFirstTimeSubmission && <Card className={ isLoading ? `w-fit m-3 p-3 !font-bold !text-white !bg-amber-400`:'!hidden'}>
+                <div className="flex justify-around items-center">
+                  <div>{"Processing..."}</div>
+                  <div>
+                    <Blocks
+                      height="40"
+                      width="30"
+                      color="#478CCF"
+                      ariaLabel="blocks-loading"
+                      wrapperStyle={{}}
+                      wrapperClass="blocks-wrapper"
+                      visible={isLoading === true}
+                    />
+                  </div>
+                </div>
+              </Card>
+              }
+          </div>
+        }
       </div>
-
       <div className="w-full">
         <Editor
           Sign={ProblemDescriptionAndSign?.Sign ?? ""}
           args={ProblemDescriptionAndSign?.args ?? ""}
           ID={ProblemDescriptionAndSign?.ID ?? 0}
+          prop={props}
+          setisLoading={setisLoading}
         />
       </div>
     </div>
   );
 }
-
 export default Submission;
