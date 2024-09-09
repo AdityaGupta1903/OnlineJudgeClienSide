@@ -15,7 +15,7 @@ const AuthForm = () => {
     
     if(username.length > 0 && password.length > 0){
        if(isLogin){
-         const resp = await axios.post('https://algoforces.backend.adityagupta.tech/login',{
+         const resp = await axios.post('https://algoforces.api.adityagupta.tech/login',{
             username : username,
             password : password
           })
@@ -34,7 +34,7 @@ const AuthForm = () => {
          }
        }
        else{
-        const resp = await axios.post('https://algoforces.backend.adityagupta.tech/Signup',{
+        const resp = await axios.post('https://algoforces.api.adityagupta.tech/Signup',{
             username : username,
             password : password
         })

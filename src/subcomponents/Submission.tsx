@@ -30,7 +30,7 @@ function Submission(props: IProp) {
   useEffect(() => {
     // Fetch problem details from the server
    
-    axios.get(`https://algoforces.backend.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
+    axios.get(`https://algoforces.api.adityagupta.tech/GetProblem/${id}`).then((resp: any) => {
       setProblemDescriptionAndSign({
         Description: resp.data.Description,
         Sign: resp.data.Sign,

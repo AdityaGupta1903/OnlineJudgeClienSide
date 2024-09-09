@@ -23,7 +23,7 @@ const Editor: React.FC<{ Sign: string; args: String; ID: number,prop:IProp,setis
     if(token){
       console.log(token);
       props.setisLoading(true);
-    fetch("https://algoforces.backend.adityagupta.tech/SubmitProblem", {
+    fetch("https://algoforces.api.adityagupta.tech/SubmitProblem", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
